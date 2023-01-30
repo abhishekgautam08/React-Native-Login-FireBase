@@ -1,11 +1,37 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Button, Text, TextInput, View} from 'react-native';
 import {StyleSheet} from 'react-native';
-const Form = ({navigation}) => {
-  //   const handleDetailsChange = value => {};
+import firestore from '@react-native-firebase/firestore';
 
-  const handleSubmitDetails = value => {
+const Form = ({navigation}) => {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+
+  const handleNameChange = value => {
+    setName(value);
+  };
+
+  const handleSubmitDetails = e => {
     navigation.navigate('Logout');
+    userDocument();
+  };
+  const userDocument = () => {
+    firestore()
+      .collection('User')
+      .add({
+        name: name,
+        number: number,
+        email: email,
+        address: address,
+      })
+      .then(() => {
+        console.info('User added!!');
+      })
+      .catch(error => {
+        console.log(error);
+      });
   };
 
   return (
@@ -14,30 +40,31 @@ const Form = ({navigation}) => {
       <Text style={styles.title}>Enter Full Name</Text>
       <TextInput
         style={styles.input}
-        keyboardType="text"
-        // onChangeText={handleDetailsChange}
-        // value={}
+        keyboardType={'text'}
+        onChangeText={handleNameChange}
+        value={name}
       />
       <Text style={styles.title}>Enter Mobile Number</Text>
       <TextInput
         style={styles.input}
-        keyboardType="numeric"
-        // onChangeText={handleDetailsChange}
-        // value={}
+        keyboardType={'numeric'}
+        maxLength={10}
+        onChangeText={text => setNumber(text)}
+        value={number}
       />
       <Text style={styles.title}>Enter Email</Text>
       <TextInput
         style={styles.input}
-        keyboardType="email"
-        // onChangeText={handleDetailsChange}
-        // value={}
+        keyboardType={'email'}
+        onChangeText={text => setEmail(text)}
+        value={email}
       />
       <Text style={styles.title}>Enter Address</Text>
       <TextInput
         style={styles.input}
-        keyboardType="text"
-        // onChangeText={handleOtpChange}
-        // value={}
+        keyboardType={'text'}
+        onChangeText={text => setAddress(text)}
+        value={address}
       />
       <Button title="Submit" onPress={handleSubmitDetails} />
     </View>

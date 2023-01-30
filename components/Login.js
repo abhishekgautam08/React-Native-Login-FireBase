@@ -1,62 +1,75 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Text, TextInput, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Button, TextInput} from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {StyleSheet} from 'react-native';
-
-function Home({navigation}) {
+function Login({navigation}) {
+  // If null, no SMS has been sent
   const [mobileNumber, setMobileNumber] = useState();
   const [confirm, setConfirm] = useState(null);
-  // const [textInputName, setTextInputName] = useState('');
+  const [code, setCode] = useState('');
 
+  // Handle the input login
   const handleMobileNumberChange = mobileNumber => {
     setMobileNumber(mobileNumber);
     value => setTextInputName(value);
   };
-  useEffect(() => {
-    if (confirm) {
-      navigation.navigate('VerifyOTP', {
-        confirm: confirm,
-      });
-    }
-  }, [confirm]);
+  // Handle the button press
+  async function signInWithPhoneNumber(phoneNumber) {
+    const confirmation = await auth().signInWithPhoneNumber(
+      '+91' + mobileNumber.trim(''),
+    );
+    setConfirm(confirmation);
+  }
 
-  const handleSendOtp = async () => {
-    // if (!textInputName.trim()) {
-    //   alert('Please Enter Number');
-    //   return;
-    // }
-    try {
-      const confirmation = await auth().signInWithPhoneNumber(
-        '+91' + mobileNumber.trim(''),
-      );
-      setConfirm(confirmation);
-    } catch (error) {
-      console.error('Error in sending otp: error:', error);
-    }
+  // Handle the input verify
+  const handleOtpChange = value => {
+    setCode(value);
   };
 
-  return (
-    <SafeAreaView>
-      <View style={styles.container}>
-        <Text style={styles.title}>Enter Mobile Number</Text>
+  async function confirmCode() {
+    try {
+      await confirm.confirm(code);
+      navigation.replace('Form');
+    } catch (error) {
+      console.log('Invalid code.');
+    }
+  }
+
+  if (!confirm) {
+    return (
+      <>
         <TextInput
           style={styles.input}
           keyboardType="numeric"
           onChangeText={handleMobileNumberChange}
           value={mobileNumber}
+          maxLength={10}
         />
-        <Button title="Send OTP" onPress={handleSendOtp} />
-      </View>
-    </SafeAreaView>
+        <Button title="Login" onPress={signInWithPhoneNumber} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <TextInput
+        value={code}
+        keyboardType="numeric"
+        onChangeText={handleOtpChange}
+        maxLength={6}
+        style={styles.input}
+      />
+      <Button title="Confirm Code" onPress={() => confirmCode()} />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 60,
-    textAlign: 'center',
-  },
+  // container: {
+  //   padding: 60,
+
+  //   textAlign: 'center',
+  // },
   title: {
     padding: 20,
     textAlign: 'center',
@@ -68,4 +81,4 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-export default Home;
+export default Login;

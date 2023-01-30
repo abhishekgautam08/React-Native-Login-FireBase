@@ -1,19 +1,18 @@
 import React from 'react';
 import {Button, Text, TextInput, View} from 'react-native';
-import auth from '@react-native-firebase/auth';
 import {StyleSheet} from 'react-native';
-const Logout = () => {
-  const handleLogout = async () => {
-    try {
-      await auth().signOut();
-    } catch (e) {
-      console.log(e);
-    }
+import auth from '@react-native-firebase/auth';
+const Logout = ({navigation}) => {
+  const handleLogout = () => {
+    // navigation.replace('Login');
+    auth()
+      .signOut()
+      .then(() => console.log('User signed out!'));
   };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Your details Saved Successfully</Text>
-      <Button title="Logout" onPress={() => handleLogout()} />
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 };
