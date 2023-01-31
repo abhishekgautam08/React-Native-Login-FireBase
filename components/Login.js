@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Button, TextInput} from 'react-native';
+import {Button, TextInput, Text, View, Alert} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {StyleSheet} from 'react-native';
 function Login({navigation}) {
@@ -13,6 +13,7 @@ function Login({navigation}) {
     setMobileNumber(mobileNumber);
     value => setTextInputName(value);
   };
+
   // Handle the button press
   async function signInWithPhoneNumber(phoneNumber) {
     const confirmation = await auth().signInWithPhoneNumber(
@@ -31,13 +32,14 @@ function Login({navigation}) {
       await confirm.confirm(code);
       navigation.replace('Form');
     } catch (error) {
-      console.log('Invalid code.');
+      Alert.alert('Invalid OTP');
     }
   }
 
   if (!confirm) {
     return (
-      <>
+      <View style={styles.container}>
+        <Text style={styles.heading}>Enter your Mobile Number</Text>
         <TextInput
           style={styles.input}
           keyboardType="numeric"
@@ -46,12 +48,13 @@ function Login({navigation}) {
           maxLength={10}
         />
         <Button title="Login" onPress={signInWithPhoneNumber} />
-      </>
+      </View>
     );
   }
 
   return (
-    <>
+    <View style={styles.container}>
+      <Text style={styles.heading}>Enter Your OTP</Text>
       <TextInput
         value={code}
         keyboardType="numeric"
@@ -60,16 +63,21 @@ function Login({navigation}) {
         style={styles.input}
       />
       <Button title="Confirm Code" onPress={() => confirmCode()} />
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  // container: {
-  //   padding: 60,
+  container: {
+    padding: 60,
 
-  //   textAlign: 'center',
-  // },
+    textAlign: 'center',
+  },
+  heading: {
+    padding: 10,
+    textAlign: 'center',
+    fontSize: 30,
+  },
   title: {
     padding: 20,
     textAlign: 'center',
